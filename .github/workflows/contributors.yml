@@ -23,7 +23,7 @@ jobs:
         run: git checkout main
       - uses: BobAnkh/add-contributors@v0.2.2
         with:
-          CONTRIBUTOR: "## Contributors"
+          CONTRIBUTOR: "## 🚀 Quick Start"
           COLUMN_PER_ROW: "6"
           ACCESS_TOKEN: ${{secrets.GH_TOKEN}}
           IMG_WIDTH: "100"
