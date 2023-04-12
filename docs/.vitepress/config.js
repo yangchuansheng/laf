@@ -5,7 +5,7 @@ import mdItCustomAttrs from "markdown-it-custom-attrs";
  * @type {DefaultTheme.NavItem[]}
  */
 const NavConfig = [
-  { text: "主页", link: "/" },
+  { text: "主页", link: "https://laf.run" },
   { text: "开发指南", link: "/guide/", activeMatch: "^/guide/" },
   { text: "API", link: "/api/cloud", activeMatch: "^/api/" },
   { text: "范例", link: "/examples/aliyun-sms", activeMatch: "^/examples/" },
@@ -13,7 +13,7 @@ const NavConfig = [
   {
     text: "在线体验",
     // target: "_self",
-    link: "https://console.lafyun.com/",
+    link: "https://laf.run/",
   },
 ];
 
@@ -79,10 +79,10 @@ const guideSiderbarConfig = [
         text: "环境变量",
         link: "/guide/function/env",
       },
-      // {
-      //   text: "WebSocket 连接",
-      //   link: "/guide/function/websocket",
-      // },
+      {
+        text: "WebSocket 连接",
+        link: "/guide/function/websocket",
+      },
     ],
   },
   {
@@ -112,8 +112,8 @@ const guideSiderbarConfig = [
   {
     text: "静态网站托管",
     items: [
-      { text: "静态托管简介", link: "/guide/website-hosting/" },
-      { text: "快速开始", link: "/guide/website-hosting/quick-start" },
+      { text: "快速开始", link: "/guide/website-hosting/" },
+      // { text: "快速开始", link: "/guide/website-hosting/quick-start" },
     ],
   },
   {
@@ -121,13 +121,8 @@ const guideSiderbarConfig = [
     items: [{ text: "laf-cli 使用说明", link: "/guide/cli/" }],
   },
   {
-    text: "FAQ",
-    items: [
-      {
-        text: "问答",
-        link: "/guide/faq/",
-      },
-    ],
+    text: "laf-client-sdk",
+    items: [{ text: "laf-client-sdk 使用说明", link: "/guide/client-sdk/" }],
   },
 ];
 
@@ -204,10 +199,10 @@ export default defineConfig({
       message: "Apache License V2.0",
       copyright: "Copyright © 2021-present labring/laf",
     },
-    // editLink: {
-    //   pattern: "https://github.com/labring/laf/edit/main/docs/:path",
-    //   text: "在 GitHub 上编辑此页",
-    // },
+    editLink: {
+      pattern: "https://github.com/labring/laf/edit/main/docs/:path",
+      text: "在 GitHub 上编辑此页",
+    },
     lastUpdated: "更新于",
     nav: NavConfig,
     socialLinks: [{ icon: "github", link: "https://github.com/labring/laf" }],

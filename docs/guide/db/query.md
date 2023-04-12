@@ -171,8 +171,8 @@ db.collection("user").where({
 
 ```js
 const _ = db.command;
-db.collection("goods").where({
-    age: _.nin([8, 16]),
+db.collection("user").where({
+    age: _.nin([8, 20]),
 });
 ```
 
@@ -195,7 +195,7 @@ db.collection("user").where({
 
 ```js
 const _ = db.command;
-db.collection("goods").where({
+db.collection("user").where({
     age: _.and(_.gt(18), _.lt(60)),
 });
 ```
@@ -306,7 +306,7 @@ collection.limit()
 
 ```js
 //promise
-collection
+db.collection("user")
   .limit(1)
   .get()
   .then(function (res) {});
@@ -326,7 +326,7 @@ collection.skip()
 
 ```js
 //promise
-collection
+db.collection("user")
   .skip(4)
   .get()
   .then(function (res) {});
@@ -347,7 +347,7 @@ collection.orderBy()
 
 ```js
 //promise
-collection
+db.collection("user")
   .orderBy("name", "asc")
   .get()
   .then(function (res) {});
@@ -366,7 +366,8 @@ collection.field()
 使用示例
 
 ```js
-collection.field({ age: 1 });
+db.collection("user")
+.field({ age: 1 });
 ```
 
 备注：只能指定要返回的字段或者不要返回的字段。即{'a': 1, 'b': 0}是一种错误的参数格式

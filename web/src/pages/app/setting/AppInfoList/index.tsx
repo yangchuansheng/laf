@@ -5,7 +5,8 @@ import { useNavigate } from "react-router-dom";
 import { Box, Button, HStack, useColorMode } from "@chakra-ui/react";
 import clsx from "clsx";
 
-import { APP_PHASE_STATUS } from "@/constants/index";
+import { APP_PHASE_STATUS, Routes } from "@/constants/index";
+import { formatDate } from "@/utils/format";
 
 import InfoDetail from "./InfoDetail";
 
@@ -20,7 +21,7 @@ const AppEnvList = () => {
   const darkMode = useColorMode().colorMode === "dark";
 
   if (currentApp?.state === APP_PHASE_STATUS.Deleted) {
-    navigate("/");
+    navigate(Routes.dashboard);
     return <></>;
   }
 
@@ -28,7 +29,7 @@ const AppEnvList = () => {
 
   return (
     <>
-      <div className="h-full flex flex-col">
+      <div className="flex h-full flex-col">
         <div className="flex h-[50px] flex-none justify-between">
           <HStack spacing={2}>
             <Box
@@ -43,7 +44,7 @@ const AppEnvList = () => {
           <HStack
             spacing={2}
             divider={
-              <span className="inline-block mr-2 rounded h-[12px] border border-grayModern-500"></span>
+              <span className="mr-2 inline-block h-[12px] rounded border border-grayModern-500"></span>
             }
           >
             <Button
@@ -76,7 +77,7 @@ const AppEnvList = () => {
             <DeleteAppModal
               item={currentApp}
               onSuccess={() => {
-                navigate("/");
+                navigate(Routes.dashboard);
               }}
             >
               <Button className="mr-2" fontWeight={"semibold"} size={"sm"} variant={"warnText"}>
@@ -86,7 +87,7 @@ const AppEnvList = () => {
             </DeleteAppModal>
           </HStack>
         </div>
-        <div className="flex-grow flex overflow-auto flex-col">
+        <div className="flex flex-grow flex-col overflow-auto">
           <InfoDetail
             title={t("SettingPanel.BaseInfo")}
             leftData={[
@@ -125,6 +126,23 @@ const AppEnvList = () => {
                 value: `${currentApp?.bundle?.resource.networkTrafficOutbound! / 1024} ${t(
                   "Unit.GB",
                 )}`,
+              },
+            ]}
+          />
+
+          <InfoDetail
+            className="mt-6"
+            title={t("SettingPanel.Subscription")}
+            leftData={[
+              {
+                key: "创建时间",
+                value: `${formatDate(currentApp?.subscription?.createdAt)}`,
+              },
+            ]}
+            rightData={[
+              {
+                key: "到期时间",
+                value: `${formatDate(currentApp?.subscription?.expiredAt)}`,
               },
             ]}
           />

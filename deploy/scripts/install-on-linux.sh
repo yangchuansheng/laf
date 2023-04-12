@@ -48,13 +48,21 @@ fi
 
 set -e
 
+# pull sealos cluster images
+sealos pull labring/kubernetes:v1.24.9
+sealos pull labring/flannel:v0.19.0
+sealos pull labring/helm:v3.8.2
+sealos pull labring/openebs:v1.9.0
+sealos pull labring/cert-manager:v1.8.0
+sealos pull lafyun/laf:latest
+
 # install k8s cluster
 sealos run labring/kubernetes:v1.24.9 labring/flannel:v0.19.0 labring/helm:v3.8.2 --single
 
 # taint master node
 NODENAME=$(kubectl get nodes -ojsonpath='{.items[0].metadata.name}')
-kubectl taint node $NODENAME node-role.kubernetes.io/master-
-kubectl taint node $NODENAME node-role.kubernetes.io/control-plane-
+kubectl taint node $NODENAME node-role.kubernetes.io/master- || true
+kubectl taint node $NODENAME node-role.kubernetes.io/control-plane- || true
 
 # label master node as a app node
 kubectl label node $NODENAME laf.dev/node.type=runtime

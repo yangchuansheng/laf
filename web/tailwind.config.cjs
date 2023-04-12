@@ -3,34 +3,43 @@ module.exports = {
   darkMode: "class",
   content: ["./index.html", "./src/**/*.{ts,tsx}"],
   theme: {
+    screens: {
+      sm: "480px",
+      md: "768px",
+      lg: "976px",
+      xl: "1440px",
+    },
     boxShadow: {
-      DEFAULT: '0px 4px 10px rgba(191, 202, 213, 0.25)',
+      DEFAULT: "0px 4px 10px rgba(191, 202, 213, 0.25)",
     },
     fontSize: {
       base: "12px",
       lg: "14px",
       xl: "16px",
       "2xl": "18px",
-      "3xl": "22px",
+      "3xl": "28px",
+      "4xl": "38px",
+      "5xl": "48px",
+      "6xl": "60px",
     },
     extend: {
       colors: {
         primary: {
-          100: "#E6F6F5",
-          200: "#CCEEEB",
-          300: "#99DDD8",
-          400: "#66CBC4",
-          500: "#33BAB1",
-          600: "#00A99D",
-          700: "#00877E",
-          800: "#00655E",
-          900: "#00443F",
-          1000: "#00221F"
+          100: "#E6F6F6",
+          200: "#CCEEED",
+          300: "#99DDDB",
+          400: "#66CBCA",
+          500: "#33BABB",
+          600: "#00A9A6",
+          700: "#008F8D",
+          800: "#006B6A",
+          900: "#004846",
+          1000: "#002423",
         },
         second: "#717D8A",
         third: {
           500: "#EC892D",
-          100: "#EC892D26"
+          100: "#EC892D26",
         },
         lafWhite: {
           100: "#FEFEFE",
@@ -42,7 +51,7 @@ module.exports = {
           700: "#C3C5C6",
           800: "#929495",
           900: "#626263",
-          1000: "#313132"
+          1000: "#313132",
         },
         lafDark: {
           100: "#1a202c",
@@ -66,7 +75,7 @@ module.exports = {
           700: "#485058",
           800: "#363C42",
           900: "#24282C",
-          1000: "#121416"
+          1000: "#121416",
         },
         grayIron: {
           100: "#F3F3F3",
@@ -78,7 +87,7 @@ module.exports = {
           700: "#68686E",
           800: "#4E4E52",
           900: "#343437",
-          1000: "#1A1A1B"
+          1000: "#1A1A1B",
         },
         error: {
           100: "#FDECEE",
@@ -92,7 +101,7 @@ module.exports = {
           700: "#C96330",
         },
         rose: {
-          100: "#FDEAF1"
+          100: "#FDEAF1",
         },
         purple: {
           300: "#DBBDE9",
@@ -108,8 +117,8 @@ module.exports = {
           700: "#2B8ABF",
         },
         frostyNightfall: {
-          200: "#EAEBF0"
-        }
+          200: "#EAEBF0",
+        },
       },
     },
   },

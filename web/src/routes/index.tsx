@@ -33,15 +33,31 @@ const routes = [
     ],
   },
   {
+    path: "/reset-password",
+    element: <AuthLayout />,
+    auth: false,
+    children: [
+      {
+        path: "/reset-password",
+        element: () => import("@/pages/auth/reset-password"),
+      },
+    ],
+  },
+  {
     path: "/",
     children: [
       {
         path: "/",
+        element: () => import("@/pages/homepage"),
+        index: true,
+      },
+      {
+        path: "/dashboard",
         element: <BasicLayout />,
         auth: true,
         children: [
           {
-            path: "/",
+            path: "/dashboard",
             element: () => import("@/pages/home/index"),
           },
         ],

@@ -1,6 +1,6 @@
 {
   "name": "runtime-nodejs",
-  "version": "1.0.0-beta.4",
+  "version": "1.0.0-beta.6",
   "description": "the node runtime for laf",
   "main": "./dist/index.js",
   "typings": "./dist/index.d.ts",
@@ -12,7 +12,8 @@
     "watch": "tsc -p tsconfig.json -w",
     "prepublishOnly": "npm run build",
     "trace-gc": "node --trace_gc --trace_gc_verbose ./dist/index.js",
-    "init": "node ./dist/init.js"
+    "init": "node ./dist/init.js",
+    "prettier": "npx prettier --write ./src"
   },
   "keywords": [
     "laf",

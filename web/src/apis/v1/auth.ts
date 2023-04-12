@@ -8,13 +8,19 @@
 ///////////////////////////////////////////////////////////////////////
 /// <reference path = "api-auto.d.ts" />
 import request from "@/utils/request";
+import useGlobalStore from "@/pages/globalStore";
 
 /**
- * Sign up
+ * Signup by user-password
  */
-export async function AuthControllerSignup(
-  params: Paths.AuthControllerSignup.BodyParameters | any,
-): Promise<Paths.AuthControllerSignup.Responses> {
+export async function UserPasswordControllerSignup(
+  params: Definitions.PasswdSignupDto | any,
+): Promise<Paths.UserPasswordControllerSignup.Responses> {
+  // /v1/auth/passwd/signup
+  let _params: { [key: string]: any } = {
+    appid: useGlobalStore.getState().currentApp?.appid || "",
+    ...params,
+  };
   return request(`/v1/auth/passwd/signup`, {
     method: "POST",
     data: params,
@@ -22,11 +28,16 @@ export async function AuthControllerSignup(
 }
 
 /**
- * Sign in by password
+ * Signin by user-password
  */
-export async function AuthControllerSigninByPassword(
-  params: Paths.AuthControllerSigninByPassword.BodyParameters | any,
-): Promise<Paths.AuthControllerSigninByPassword.Responses> {
+export async function UserPasswordControllerSignin(
+  params: Definitions.PasswdSigninDto | any,
+): Promise<Paths.UserPasswordControllerSignin.Responses> {
+  // /v1/auth/passwd/signin
+  let _params: { [key: string]: any } = {
+    appid: useGlobalStore.getState().currentApp?.appid || "",
+    ...params,
+  };
   return request(`/v1/auth/passwd/signin`, {
     method: "POST",
     data: params,
@@ -34,44 +45,16 @@ export async function AuthControllerSigninByPassword(
 }
 
 /**
- * Sign in by sms code
- * @param {string} phone
- * @param {string} code
+ * Reset password
  */
-export async function AuthControllerSigninBySmsCode(
-  params: Paths.AuthControllerSigninBySmsCode.BodyParameters | any,
-): Promise<Paths.AuthControllerSigninBySmsCode.Responses> {
-  return request(`/v1/auth/phone/signin`, {
-    method: "POST",
-    data: params,
-  });
-}
-
-/**
- * Send sms code
- * @param {string} phone
- * @param {string} type
- */
-export async function AuthControllerSendSmsCode(
-  params: Paths.AuthControllerSendSmsCode.BodyParameters | any,
-): Promise<Paths.AuthControllerSendSmsCode.Responses> {
-  return request(`/v1/auth/phone/sms/code`, {
-    method: "POST",
-    data: params,
-  });
-}
-
-/**
- * reset password
- * @param {string} phone
- * @param {string} code
- * @param {string} password
- * @param {string} confirmPassword
- * @param {string} type
- */
-export async function AuthControllerResetPassword(
-  params: Paths.AuthControllerResetPassword.BodyParameters | any,
-): Promise<Paths.AuthControllerResetPassword.Responses> {
+export async function UserPasswordControllerReset(
+  params: Definitions.PasswdResetDto | any,
+): Promise<Paths.UserPasswordControllerReset.Responses> {
+  // /v1/auth/passwd/reset
+  let _params: { [key: string]: any } = {
+    appid: useGlobalStore.getState().currentApp?.appid || "",
+    ...params,
+  };
   return request(`/v1/auth/passwd/reset`, {
     method: "POST",
     data: params,
@@ -79,13 +62,103 @@ export async function AuthControllerResetPassword(
 }
 
 /**
- * get providers
+ * Check if user-password is set
  */
-export async function AuthControllerGetProviders(
-  params: Paths.AuthControllerGetProviders.BodyParameters | any,
-): Promise<Paths.AuthControllerGetProviders.Responses> {
+export async function UserPasswordControllerCheck(
+  params: Definitions.PasswdCheckDto | any,
+): Promise<Paths.UserPasswordControllerCheck.Responses> {
+  // /v1/auth/passwd/check
+  let _params: { [key: string]: any } = {
+    appid: useGlobalStore.getState().currentApp?.appid || "",
+    ...params,
+  };
+  return request(`/v1/auth/passwd/check`, {
+    method: "POST",
+    data: params,
+  });
+}
+
+/**
+ * Send phone verify code
+ */
+export async function PhoneControllerSendCode(
+  params: Definitions.SendPhoneCodeDto | any,
+): Promise<Paths.PhoneControllerSendCode.Responses> {
+  // /v1/auth/phone/sms/code
+  let _params: { [key: string]: any } = {
+    appid: useGlobalStore.getState().currentApp?.appid || "",
+    ...params,
+  };
+  return request(`/v1/auth/phone/sms/code`, {
+    method: "POST",
+    data: params,
+  });
+}
+
+/**
+ * Signin by phone and verify code
+ */
+export async function PhoneControllerSignin(
+  params: Definitions.PhoneSigninDto | any,
+): Promise<Paths.PhoneControllerSignin.Responses> {
+  // /v1/auth/phone/signin
+  let _params: { [key: string]: any } = {
+    appid: useGlobalStore.getState().currentApp?.appid || "",
+    ...params,
+  };
+  return request(`/v1/auth/phone/signin`, {
+    method: "POST",
+    data: params,
+  });
+}
+
+/**
+ * Auth providers
+ */
+export async function AuthenticationControllerGetProviders(
+  params: Paths.AuthenticationControllerGetProviders.BodyParameters | any,
+): Promise<Paths.AuthenticationControllerGetProviders.Responses> {
+  // /v1/auth/providers
+  let _params: { [key: string]: any } = {
+    appid: useGlobalStore.getState().currentApp?.appid || "",
+    ...params,
+  };
   return request(`/v1/auth/providers`, {
     method: "GET",
     params: params,
+  });
+}
+
+/**
+ * Bind username
+ */
+export async function AuthenticationControllerBindPhone(
+  params: Definitions.BindPhoneDto | any,
+): Promise<Paths.AuthenticationControllerBindPhone.Responses> {
+  // /v1/auth/bind/phone
+  let _params: { [key: string]: any } = {
+    appid: useGlobalStore.getState().currentApp?.appid || "",
+    ...params,
+  };
+  return request(`/v1/auth/bind/phone`, {
+    method: "POST",
+    data: params,
+  });
+}
+
+/**
+ * Bind username
+ */
+export async function AuthenticationControllerBindUsername(
+  params: Definitions.BindUsernameDto | any,
+): Promise<Paths.AuthenticationControllerBindUsername.Responses> {
+  // /v1/auth/bind/username
+  let _params: { [key: string]: any } = {
+    appid: useGlobalStore.getState().currentApp?.appid || "",
+    ...params,
+  };
+  return request(`/v1/auth/bind/username`, {
+    method: "POST",
+    data: params,
   });
 }

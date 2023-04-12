@@ -1,9 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common'
-import { DomainPhase, DomainState, StorageBucket } from '@prisma/client'
+import {
+  DomainPhase,
+  DomainState,
+  StorageBucket,
+  WebsiteHosting,
+} from '@prisma/client'
 import { RegionService } from 'src/region/region.service'
 import * as assert from 'node:assert'
 import { Cron, CronExpression } from '@nestjs/schedule'
-import { times } from 'lodash'
 import { ServerConfig, TASK_LOCK_INIT_TIME } from 'src/constants'
 import { SystemDatabase } from 'src/database/system-database'
 import { MinioService } from './minio/minio.service'
@@ -12,7 +16,6 @@ import { BucketDomainService } from 'src/gateway/bucket-domain.service'
 @Injectable()
 export class BucketTaskService {
   readonly lockTimeout = 30 // in second
-  readonly concurrency = 1 // concurrency count
   private readonly logger = new Logger(BucketTaskService.name)
 
   constructor(
@@ -28,22 +31,29 @@ export class BucketTaskService {
     }
 
     // Phase `Creating` -> `Created`
-    times(this.concurrency, () => this.handleCreatingPhase())
+    this.handleCreatingPhase().catch((err) => {
+      this.logger.error(err)
+    })
 
     // Phase `Deleting` -> `Deleted`
-    times(this.concurrency, () => this.handleDeletingPhase())
+    this.handleDeletingPhase().catch((err) => {
+      this.logger.error(err)
+    })
 
     // Phase `Created` -> `Deleting`
-    this.handleInactiveState()
+    this.handleInactiveState().catch((err) => {
+      this.logger.error(err)
+    })
 
     // Phase `Deleted` -> `Creating`
-    this.handleActiveState()
+    this.handleActiveState().catch((err) => {
+      this.logger.error(err)
+    })
 
     // Phase `Deleting` -> `Deleted`
-    this.handleDeletedState()
-
-    // Clear timeout locks
-    this.clearTimeoutLocks()
+    this.handleDeletedState().catch((err) => {
+      this.logger.error(err)
+    })
   }
 
   /**
@@ -59,15 +69,9 @@ export class BucketTaskService {
       .findOneAndUpdate(
         {
           phase: DomainPhase.Creating,
-          lockedAt: {
-            $lt: new Date(Date.now() - 1000 * this.lockTimeout),
-          },
+          lockedAt: { $lt: new Date(Date.now() - 1000 * this.lockTimeout) },
         },
-        {
-          $set: {
-            lockedAt: new Date(),
-          },
-        },
+        { $set: { lockedAt: new Date() } },
       )
     if (!res.value) return
 
@@ -105,16 +109,8 @@ export class BucketTaskService {
     const updated = await db
       .collection<StorageBucket>('StorageBucket')
       .updateOne(
-        {
-          _id: doc._id,
-          phase: DomainPhase.Creating,
-        },
-        {
-          $set: {
-            phase: DomainPhase.Created,
-            lockedAt: TASK_LOCK_INIT_TIME,
-          },
-        },
+        { _id: doc._id, phase: DomainPhase.Creating },
+        { $set: { phase: DomainPhase.Created, lockedAt: TASK_LOCK_INIT_TIME } },
       )
 
     if (updated.modifiedCount > 0)
@@ -134,15 +130,9 @@ export class BucketTaskService {
       .findOneAndUpdate(
         {
           phase: DomainPhase.Deleting,
-          lockedAt: {
-            $lt: new Date(Date.now() - 1000 * this.lockTimeout),
-          },
+          lockedAt: { $lt: new Date(Date.now() - 1000 * this.lockTimeout) },
         },
-        {
-          $set: {
-            lockedAt: new Date(),
-          },
-        },
+        { $set: { lockedAt: new Date() } },
       )
     if (!res.value) return
 
@@ -170,20 +160,24 @@ export class BucketTaskService {
       this.logger.debug('bucket domain deleted:', domain)
     }
 
+    // delete bucket website if exists
+    const websiteRes = await db
+      .collection<WebsiteHosting>('WebsiteHosting')
+      .updateMany(
+        { appid: doc.appid, bucketName: doc.name },
+        { $set: { state: DomainState.Deleted } },
+      )
+
+    if (websiteRes.modifiedCount > 0) {
+      this.logger.log('website state set to Deleted for bucket: ' + doc.name)
+    }
+
     // update phase to `Deleted`
     const updated = await db
       .collection<StorageBucket>('StorageBucket')
       .updateOne(
-        {
-          _id: doc._id,
-          phase: DomainPhase.Deleting,
-        },
-        {
-          $set: {
-            phase: DomainPhase.Deleted,
-            lockedAt: TASK_LOCK_INIT_TIME,
-          },
-        },
+        { _id: doc._id, phase: DomainPhase.Deleting },
+        { $set: { phase: DomainPhase.Deleted, lockedAt: TASK_LOCK_INIT_TIME } },
       )
 
     if (updated.modifiedCount > 0)
@@ -201,12 +195,10 @@ export class BucketTaskService {
       {
         state: DomainState.Active,
         phase: DomainPhase.Deleted,
+        lockedAt: { $lt: new Date(Date.now() - 1000 * this.lockTimeout) },
       },
       {
-        $set: {
-          phase: DomainPhase.Creating,
-          lockedAt: TASK_LOCK_INIT_TIME,
-        },
+        $set: { phase: DomainPhase.Creating, lockedAt: TASK_LOCK_INIT_TIME },
       },
     )
   }
@@ -222,12 +214,10 @@ export class BucketTaskService {
       {
         state: DomainState.Inactive,
         phase: DomainPhase.Created,
+        lockedAt: { $lt: new Date(Date.now() - 1000 * this.lockTimeout) },
       },
       {
-        $set: {
-          phase: DomainPhase.Deleting,
-          lockedAt: TASK_LOCK_INIT_TIME,
-        },
+        $set: { phase: DomainPhase.Deleting, lockedAt: TASK_LOCK_INIT_TIME },
       },
     )
   }
@@ -243,39 +233,16 @@ export class BucketTaskService {
     await db.collection<StorageBucket>('StorageBucket').updateMany(
       {
         state: DomainState.Deleted,
-        phase: DomainPhase.Created,
+        phase: { $in: [DomainPhase.Created, DomainPhase.Creating] },
+        lockedAt: { $lt: new Date(Date.now() - 1000 * this.lockTimeout) },
       },
       {
-        $set: {
-          phase: DomainPhase.Deleting,
-          lockedAt: TASK_LOCK_INIT_TIME,
-        },
+        $set: { phase: DomainPhase.Deleting, lockedAt: TASK_LOCK_INIT_TIME },
       },
     )
 
-    await db.collection<StorageBucket>('StorageBucket').deleteMany({
-      state: DomainState.Deleted,
-      phase: DomainPhase.Deleted,
-    })
-  }
-
-  /**
-   * Clear timeout locks
-   */
-  async clearTimeoutLocks() {
-    const db = SystemDatabase.db
-
-    await db.collection<StorageBucket>('StorageBucket').updateMany(
-      {
-        lockedAt: {
-          $lt: new Date(Date.now() - 1000 * this.lockTimeout),
-        },
-      },
-      {
-        $set: {
-          lockedAt: TASK_LOCK_INIT_TIME,
-        },
-      },
-    )
+    await db
+      .collection<StorageBucket>('StorageBucket')
+      .deleteMany({ state: DomainState.Deleted, phase: DomainPhase.Deleted })
   }
 }
